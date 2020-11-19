@@ -62,8 +62,8 @@ int main(void) {
         }
         
         else if(turn == 1) {
-            for(int i = 0, j, k = 0; i < 3, k == 0; i++) { 
-                for(j = 0; j < 3, k == 0; j++) { 
+            for(int i = 0, j, k = 0; i < 3 && k == 0; i++) { 
+                for(j = 0; j < 3 && k == 0; j++) { 
                     if(arr[i][j] == ' ') { 
                         arr[i][j] = 'O';
                         countMoves++;
