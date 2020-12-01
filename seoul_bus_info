@@ -143,7 +143,6 @@ void find_by_line_name(_bus_data * ptr_bus_info, int size)
 {
     char st[SN_SIZE] = { 0 };               // 키보드 입력을 받을 문자열
     int found;                     // strstr 명령어를 사용하여 구조체를 검색할때 리턴값을 저장
-    char *found_similar;
     int i = 0, count = 0;
     
     printf("버스노선명을 입력하세요: ");
