@@ -29,10 +29,9 @@ void find_by_line_name(_bus_data * ptr_bus_info, int size);
 
 int main(void)
 {
-    const int buffer_size = 255;                    // fgets로 읽어들일 임시 문자열의 버퍼 용량
     _bus_data bus_data_list[SIZE];                  // 불러온 파일 데이터가 저장될 배열
     FILE *fp_bus_data;                              // 파일 포인터
-    char read_buffer[buffer_size];                  // fgets로 읽어들일 임시 문자열 
+    char read_buffer[255];                  // fgets로 읽어들일 임시 문자열 
     int index = 0;                                  // 불러온 데이터 갯수를 저장
     int menu_option = -1;                           // 메뉴에 사용할 변수
     int scanf_result;                               // scanf 에러 검출을 위한 변수
@@ -43,7 +42,7 @@ int main(void)
     }                                               // 파일 열기가 실패하면 에러메세지를 출력하고 프로그램 종료
     rewind(fp_bus_data);                            // 파일 포인터를 파일이 시작하는 부분으로 되돌리기
     
-    while(fgets(read_buffer, buffer_size, fp_bus_data) != NULL) {       // fgets는 buffer_size만큼만 읽거나, '\n'(뉴라인)까지 읽음. EOF를 만나면 NULL을 리턴하고 루프종료
+    while(fgets(read_buffer, 255, fp_bus_data) != NULL) {       // fgets는 buffer_size만큼만 읽거나, '\n'(뉴라인)까지 읽음. EOF를 만나면 NULL을 리턴하고 루프종료
         for(int i = 0; i < strlen(read_buffer); i++) {                          // 임시버퍼에 읽은 파일을 구조체에 저장하기 쉽게 ','(콤마) 를 ' ' (빈칸)으로 교체
             if(read_buffer[i] == ',') {
                 read_buffer[i] = ' ';
@@ -106,7 +105,7 @@ int main(void)
 void find_by_station_name(_bus_data * ptr_bus_info, int size)
 {
     char st[SN_SIZE] = { 0 };                      // 키보드 입력을 받을 문자열
-    char *found = NULL;                            // strstr 명령어를 사용하여 구조체를 검색할때 리턴값을 저장
+    char *found;                            // strstr 명령어를 사용하여 구조체를 검색할때 리턴값을 저장
     int i = 0, count = 0;
     
     printf("정류장 이름을 입력하세요(일부 명칭도 가능): ");
