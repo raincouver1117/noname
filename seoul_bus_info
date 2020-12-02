@@ -29,14 +29,14 @@ void find_by_line_name(_bus_data * ptr_bus_info, int size);
 
 int main(void)
 {
-    _bus_data bus_data_list[SIZE];                  // 불러온 파일 데이터가 저장될 배열
+    static _bus_data bus_list[SIZE];                  // 불러온 파일 데이터가 저장될 배열
     FILE *fp_bus_data;                              // 파일 포인터
     char read_buffer[255];                  // fgets로 읽어들일 임시 문자열 
     int index = 0;                                  // 불러온 데이터 갯수를 저장
     int menu_option = -1;                           // 메뉴에 사용할 변수
     int scanf_result;                               // scanf 에러 검출을 위한 변수
     
-    if((fp_bus_data = fopen("seoul_bus_info.txt", "r")) == NULL) {
+    if((fp_bus_data = fopen(BI_FILE, "r")) == NULL) {
         fprintf(stderr,"Can\'t open \"seoul_bus_info.txt\"\n");
         exit(EXIT_FAILURE);
     }                                               // 파일 열기가 실패하면 에러메세지를 출력하고 프로그램 종료
@@ -49,7 +49,9 @@ int main(void)
             }
         }
         
-        sscanf(read_buffer, "%d %s %d %d %d %d %s %lf %lf", &bus_data_list[index].line_id, bus_data_list[index].line_name, &bus_data_list[index].order, &bus_data_list[index].link_id, &bus_data_list[index].station_id, &bus_data_list[index].ars_id, bus_data_list[index].station_name, &bus_data_list[index].loc.x, &bus_data_list[index].loc.y);
+        sscanf(read_buffer, "%d %s %d %d %d %d %s %lf %lf", &bus_list[index].line_id, bus_list[index].line_name,
+			&bus_list[index].order, &bus_list[index].link_id, &bus_list[index].station_id, &bus_list[index].ars_id,
+			bus_list[index].station_name, &bus_list[index].loc.x, &bus_list[index].loc.y);
         
         /* 한줄씩 읽어들인 데이터를 하나씩 구분하여 저장하기 보다는 한번에 저장하면 코딩할 라인이 매우 줄어들지만,
          자료가 중간에 오염되어 있으면 그 지점으로 으로부터 칸이 밀리거나 당겨질수도 있고 타입이 맞지 않으면 에러가 뜸 */
@@ -75,10 +77,10 @@ int main(void)
     while(menu_option > 0 && menu_option < 3) {             // 메뉴 항목에 따라 스위치를 사용하여 각 함수를 호출
         switch(menu_option) {
             case 1:
-                find_by_station_name(bus_data_list, index);
+                find_by_station_name(bus_list, index);
                 break;
             case 2:
-                find_by_line_name(bus_data_list, index);
+                find_by_line_name(bus_list, index);
                 break;
             default : ;
         }
@@ -109,23 +111,13 @@ void find_by_station_name(_bus_data * ptr_bus_info, int size)
     int i = 0, count = 0;
     
     printf("정류장 이름을 입력하세요(일부 명칭도 가능): ");
-    
-    while(getchar() != '\n')                       // 키보드입력 버퍼를 비워주어 검색어 입력시 발생할 오류를 방지
-        continue;
-    
-    char *ret_val = fgets(st, SN_SIZE, stdin);
-    if(ret_val) {
-        while(st[i] != '\n' && st[i] != '\0')
-            i++;
-        if(st[i] == '\n')
-            st[i] = '\0';
-        else
-            while(getchar() != '\n')
-                continue;
-    }                                               // fgets는 \n (뉴라인) 까지 입력되므로 뉴라인을 없애주어야 오류가 없음
+	while(getchar() != '\n')
+		continue;
+		
+	scanf("%s", st);
     
     for(i = 0; i < size; i++) {
-        if((found = strstr((ptr_bus_info + i)->station_name, ret_val))) {
+        if((found = strstr((ptr_bus_info + i)->station_name, st))) {
             printf("[%s] 정류소에 [%s] 버스가 정차합니다.\n", (ptr_bus_info + i)->station_name, (ptr_bus_info + i)->line_name);
             count++;
         }       // 검색어를 검색하여 일치하면 포인터를 반환하고, 그렇지 않으면 NULL을 리턴하므로 포인터를 반환하는경우 메세지 출력
@@ -136,28 +128,18 @@ void find_by_station_name(_bus_data * ptr_bus_info, int size)
 
 void find_by_line_name(_bus_data * ptr_bus_info, int size)
 {
-    char st[SN_SIZE] = { 0 };               // 키보드 입력을 받을 문자열
+    char st[LN_SIZE] = { 0 };               // 키보드 입력을 받을 문자열
     int found;                              // strcmp 명령어를 사용하여 구조체를 검색할때 리턴값을 저장
     int i = 0, count = 0;
     
     printf("버스노선명을 입력하세요: ");
-    
-    while(getchar() != '\n')                // 키보드입력 버퍼를 비워주어 검색어 입력시 발생할 오류를 방지
-        continue;
-    
-    char *ret_val = fgets(st, SN_SIZE, stdin);
-    if(ret_val) {
-        while(st[i] != '\n' && st[i] != '\0')
-            i++;
-        if(st[i] == '\n')
-            st[i] = '\0';
-        else
-            while(getchar() != '\n')
-                continue;
-    }
-    
+	while(getchar() != '\n')
+		continue;
+ 		
+	scanf("%s", st);
+	
     for(i = 0; i < size; i++) {
-        if((found = strcmp((ptr_bus_info + i)->line_name, ret_val)) == 0) {
+        if((found = strcmp((ptr_bus_info + i)->line_name, st)) == 0) {
             printf("[%s] 버스가 [%s] 정류장에 정차합니다.\n", (ptr_bus_info + i)->line_name, (ptr_bus_info + i)->station_name);
             count++;
         }
